@@ -3,20 +3,27 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
-func listBooks(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "List of Books!")
-}
-
-func getBook(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Just a Book!")
-}
-
 func main() {
-	http.HandleFunc("/books", listBooks)
-	http.HandleFunc("/books/{id}", getBook)
+	router := chi.NewRouter()
 
-	fmt.Println("Server runnin at http://localhost:8080/")
-	http.ListenAndServe(":8080", nil)
+	router.Use(middleware.Logger)
+
+	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello from Chi"))
+	})
+
+	server := &http.Server{
+		Addr:    ":3000",
+		Handler: router,
+	}
+
+	err := server.ListenAndServe()
+	if err != nil {
+		fmt.Println("Failed to start server\n", err)
+	}
 }
