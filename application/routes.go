@@ -24,7 +24,7 @@ func loadRoutes() *chi.Mux {
 }
 
 func loadBookRoutes(r chi.Router) {
-	bookHandler := &handler.Book{}
+	bookHandler := &handler.BookHandler{}
 
 	r.Post("/", bookHandler.Create)
 	r.Get("/", bookHandler.List)
