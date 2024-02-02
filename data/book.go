@@ -1,14 +1,16 @@
 package data
 
-import "errors"
+import (
+	"errors"
+)
 
 type Book struct {
-	ID       int    `json:"id"`
-	Title    string `json:"title"`
-	Author   string `json:"author"`
-	Year     int    `json:"year"`
-	Language string `json:"language"`
-	Pages    int    `json:"pages"`
+	ID       int    `json:"id" validate:"required,number,gt=0"`
+	Title    string `json:"title" validate:"required,min=1"`
+	Author   string `json:"author" validate:"required,min=1"`
+	Year     int    `json:"year" validate:"required,number,gt=0"`
+	Language string `json:"language" validate:"required,min=1"`
+	Pages    int    `json:"pages" validate:"required,number,gt=0"`
 }
 
 type BookData struct{}
@@ -32,8 +34,15 @@ var Books = []Book{
 	},
 }
 
-func (bd *BookData) Create(data Book) {
+func (bd *BookData) Create(data Book) error {
+	for _, book := range Books {
+		if book.ID == data.ID {
+			return errors.New("Book ID already exists")
+		}
+	}
+
 	Books = append(Books, data)
+	return nil
 }
 
 func (bd *BookData) List() []Book {
@@ -43,7 +52,7 @@ func (bd *BookData) List() []Book {
 func (bd *BookData) GetByID(id int) (Book, error) {
 	for _, book := range Books {
 		if book.ID == id {
-			return book, nil 
+			return book, nil
 		}
 	}
 
